@@ -5,6 +5,7 @@
 
   let email = '';
   let password = '';
+  let role = 'USER';
   let error = '';
   let loading = false;
 
@@ -12,7 +13,7 @@
     error = '';
     loading = true;
     try {
-      const data = await api.post('/auth/register', { email, password }, { auth: false });
+      const data = await api.post('/auth/register', { email, password, role }, { auth: false });
       setSession(data.token, data.user);
       navigate('/dashboard');
     } catch (err) {
@@ -34,6 +35,13 @@
       <label for="password">Password</label>
       <input id="password" type="password" bind:value={password} required minlength="8" autocomplete="new-password" />
       <p class="help-text">At least 8 characters.</p>
+    </div>
+    <div class="field">
+      <label for="role">Account type</label>
+      <select id="role" bind:value={role}>
+        <option value="USER">User</option>
+        <option value="ADMIN">Admin</option>
+      </select>
     </div>
     {#if error}<p class="error-text">{error}</p>{/if}
     <button type="submit" disabled={loading}>{loading ? 'Creating account…' : 'Sign up'}</button>
