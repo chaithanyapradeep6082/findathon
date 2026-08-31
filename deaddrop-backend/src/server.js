@@ -17,7 +17,17 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
+app.use(cors({
+  origin: process.env.CLIENT_ORIGIN,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.options(/.*/, cors({
+  origin: process.env.CLIENT_ORIGIN,
+  credentials: true
+}));
 app.use(express.json({ limit: '1mb' }));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
