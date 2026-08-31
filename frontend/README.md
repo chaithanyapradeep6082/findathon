@@ -1,43 +1,35 @@
-# Svelte + Vite
+# DeadDrop frontend (Svelte + Vite)
 
-This template should help get you started developing with Svelte in Vite.
+A minimal SPA for the DeadDrop API: sender dashboard, package creation, the
+public recipient access flow, and an admin console.
 
-## Recommended IDE Setup
+## Setup
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
-
-## Need an official Svelte framework?
-
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
-
-## Technical considerations
-
-**Why use this over SvelteKit?**
-
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
-
-This template contains as little as possible to get started with Vite + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
-
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
-
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `checkJs` in the JS template?**
-
-It is likely that most cases of changing variable types in runtime are likely to be accidental, rather than deliberate. This provides advanced typechecking out of the box. Should you like to take advantage of the dynamically-typed nature of JavaScript, it is trivial to change the configuration.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```js
-// store.js
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+```bash
+npm install
+cp .env.example .env   # point VITE_API_URL at your backend, e.g. http://localhost:4000/api
+npm run dev
 ```
+
+## Structure
+
+- `src/lib/api.js` — fetch wrapper that attaches the JWT and normalizes errors
+- `src/lib/auth.js` — auth store persisted to `localStorage`
+- `src/lib/router.js` — tiny hash-based router (`#/dashboard`, `#/access/:token`, …)
+- `src/pages/Login.svelte`, `Register.svelte` — auth
+- `src/pages/Dashboard.svelte`, `CreatePackage.svelte` — sender side
+- `src/pages/Access.svelte` — public recipient flow: check link status, then
+  a deliberate "Reveal package" action (so simply visiting the link doesn't
+  consume a view)
+- `src/pages/Admin.svelte` — packages / users / attempts / audit log, each
+  with search, filtering, and pagination against the corresponding
+  `/api/admin/*` endpoint
+
+## Design notes
+
+Dark, low-contrast surface with a cold teal accent for "active/secure" states,
+amber for revoked, and red reserved for locked (the state that signals
+someone was trying to brute-force a package) — so the one alarming color in
+the UI means something specific rather than being decoration. Monospace is
+used only for literal data (tokens, timestamps, IDs), not as a stylistic label
+font.
